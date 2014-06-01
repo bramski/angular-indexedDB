@@ -37,10 +37,10 @@ angular.module('xc.indexedDB', []).provider('$indexedDB', function() {
         console.log('Transaction aborted: '+ (e.target.webkitErrorMessage || e.target.error.message || e.target.errorCode));
     };
     module.onTransactionError = function(e) {
-        console.log('Transaction failed: ' + e.target.errorCode);
+        console.log('Transaction failed: ' + (e.target.error.message || e.target.errorCode));
     };
     module.onDatabaseError = function(e) {
-        alert("Database error: " + (e.target.webkitErrorMessage || e.target.errorCode));
+        alert("Database error: " + (e.target.webkitErrorMessage || e.target.error.message || e.target.errorCode));
     };
     module.onDatabaseBlocked = function(e) {
         // If some other tab is loaded with the database, then it needs to be closed
