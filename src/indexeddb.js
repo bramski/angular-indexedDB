@@ -37,10 +37,10 @@ angular.module('xc.indexedDB', []).provider('$indexedDB', function() {
         console.log('Transaction aborted: '+ (e.target.webkitErrorMessage || e.target.error.message || e.target.errorCode));
     };
     module.onTransactionError = function(e) {
-        console.log('Transaction failed: ' + e.target.errorCode);
+        console.log('Transaction failed: ' + (e.target.error.message || e.target.errorCode));
     };
     module.onDatabaseError = function(e) {
-        alert("Database error: " + (e.target.webkitErrorMessage || e.target.errorCode));
+        alert("Database error: " + (e.target.webkitErrorMessage || e.target.error.message || e.target.errorCode));
     };
     module.onDatabaseBlocked = function(e) {
         // If some other tab is loaded with the database, then it needs to be closed
@@ -228,7 +228,7 @@ angular.module('xc.indexedDB', []).provider('$indexedDB', function() {
                                $rootScope.$apply(function(){
                                     d.notify(e.target.result);
                                 }); 
-                            }
+                            };
                             req.onerror = function(e) {
                                 $rootScope.$apply(function(){
                                     d.reject(e.target.result);
@@ -319,7 +319,7 @@ angular.module('xc.indexedDB', []).provider('$indexedDB', function() {
                                $rootScope.$apply(function(){
                                     d.notify(e.target.result);
                                 }); 
-                            }
+                            };
                             req.onerror = function(e) {
                                 $rootScope.$apply(function(){
                                     d.reject(e.target.result);
@@ -400,8 +400,15 @@ angular.module('xc.indexedDB', []).provider('$indexedDB', function() {
              * @returns {object} $q.promise a promise on successfull execution
              */
             "count": function() {
+                var d = $q.defer();
                 return this.internalObjectStore(this.storeName, READONLY).then(function(store){
-                    return store.count();
+                    var req = store.count();
+                    req.onsuccess = req.onerror = function(e) {
+                        $rootScope.$apply(function(){
+                            d.resolve(e.target.result);
+                        });
+                    };
+                    return d.promise;
                 });
             },
             /**
