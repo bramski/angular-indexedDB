@@ -37,11 +37,14 @@ describe "$indexedDB", ->
   describe "#openStores", ->
 
     itPromises "returns the object stores", ->
-      @subject.openStores ["TestObjects","ComplexTestObjecs"] , (store1, store2) ->
+      @subject.openStores ["TestObjects","ComplexTestObjects"] , (store1, store2) ->
         store1.insert({id: 1, data : "foo"})
         store2.insert({id: 2, name: "barf"})
         store1.getAllKeys().then (keys) ->
           expect(keys.length).toEqual(1)
+      .catch (err)->
+        # not run to here
+        expect(err).toBeUndefined()
 
   describe "#openAllStores", ->
       itPromises "returns all the object stores", ->

@@ -120,8 +120,11 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
         db = null
         dbPromise = null
 
-    validateStoreNames = (storeNames) ->
-      db.objectStoreNames.contains(storeNames)
+    validateStoreNames = (storeNames)->
+      for storeName in storeNames
+        console.log storeName
+        return false if not db.objectStoreNames.contains storeName
+      true
 
     openTransaction = (storeNames, mode = dbMode.readonly) ->
       openDatabase().then ->
