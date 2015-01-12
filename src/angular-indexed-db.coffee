@@ -111,10 +111,13 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
         return
       dbReq.onblocked = dbReq.onerror = rejectWithError(deferred)
       dbReq.onupgradeneeded = (event) ->
+        oldVersion = event.oldVersion
+        if oldVersion > 99999999999
+            oldVersion = 0
         db = event.target.result
         tx = event.target.transaction
-        console.debug "$indexedDB: Upgrading database '#{db.name}' from version #{event.oldVersion} to version #{event.newVersion} ..."
-        applyNeededUpgrades event.oldVersion, event, db, tx
+        console.debug "$indexedDB: Upgrading database '#{db.name}' from version #{oldVersion} to version #{event.newVersion} ..."
+        applyNeededUpgrades oldVersion, event, db, tx
         return
       deferred.promise
 
@@ -141,7 +144,10 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
 
 
     keyRangeForOptions = (options) ->
-      IDBKeyRange.bound(options.beginKey, options.endKey) if options.beginKey and options.endKey
+      if options.beginKey and options.endKey
+         IDBKeyRange.bound(options.beginKey, options.endKey)
+      else
+         null
 
     addTransaction = (transaction) ->
       allTransactions.push(transaction.promise)
