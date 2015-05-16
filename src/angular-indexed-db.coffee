@@ -102,7 +102,8 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
 
     createDatabaseConnection = ->
       deferred = $q.defer()
-      dbReq = indexedDB.open(dbName, dbVersion or 1)
+      # IE11 workaround - parseInt reminds IE that dbVersion is actually a number
+      dbReq = indexedDB.open(dbName, parseInt(dbVersion) or 1)
       dbReq.onsuccess = ->
         db = dbReq.result
         $rootScope.$apply ->
