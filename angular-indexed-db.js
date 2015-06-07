@@ -98,8 +98,14 @@
     @returns {object} this
      */
     this.upgradeDatabase = function(newVersion, callback) {
+      var keys;
       upgradesByVersion[newVersion] = callback;
-      dbVersion = Math.max.apply(null, Object.keys(upgradesByVersion));
+      keys = Object.keys(upgradesByVersion);
+      if (keys.length > 1) {
+        dbVersion = Math.max.apply(null, keys);
+      } else {
+        dbVersion = parseInt(keys[0]);
+      }
       return this;
     };
     this.$get = [
