@@ -93,7 +93,7 @@ angular.module('myModuleName')
     
     $scope.objects = [];
         
-    $indexedDB.openStore('people', (store) ->
+    $indexedDB.openStore('people', function(store) {
     
       store.insert({"ssn": "444-444-222-111","name": "John Doe", "age": 57}).then(function(e){...});
     
@@ -102,7 +102,8 @@ angular.module('myModuleName')
         $scope.objects = people;
       });
 
-  });
+    });
+  })
 ```
 
 ## openStore
