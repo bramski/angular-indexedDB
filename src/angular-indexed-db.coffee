@@ -91,7 +91,12 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
   ###
   @upgradeDatabase = (newVersion, callback) ->
     upgradesByVersion[newVersion] = callback
-    dbVersion = Math.max.apply(null, Object.keys(upgradesByVersion))
+    keys = Object.keys(upgradesByVersion)
+    # Workaround for IE bug #1358994 (issue with a single arg to Math.max)
+    if keys.length > 1
+      dbVersion = Math.max.apply(null, keys)
+    else
+      dbVersion = parseInt(keys[0])
     this
 
   @$get = ['$q', '$rootScope', '$log', ($q, $rootScope, $log) ->
