@@ -13,7 +13,7 @@
   angular.module('indexedDB', []).provider('$indexedDB', function() {
     var IDBKeyRange, allTransactions, apiDirection, appendResultsToPromise, applyNeededUpgrades, cursorDirection, db, dbMode, dbName, dbPromise, dbVersion, defaultQueryOptions, errorMessageFor, indexedDB, readyState, upgradesByVersion;
     indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-    IDBKeyRange = window.IDBKeyRange || window.mozIDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+    IDBKeyRange = window.IDBKeyRange || window.mozIDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange || window.shimIndexedDB;
     dbMode = {
       readonly: "readonly",
       readwrite: "readwrite"
