@@ -214,10 +214,12 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
       defer: ->
         new DbQ()
 
-      _mapCursor: (defer, mapFunc, req = @store.openCursor()) ->
+      _mapCursor: (defer, mapFunc, req = @store.openCursor(), limit) ->
         results = []
         defer.rejectWith(req)
         req.onsuccess = (e) ->
+          if limit != null && limit > 0 && results.length >= limit
+            return defer.resolve(results)
           if cursor = e.target.result
             results.push(mapFunc(cursor))
             defer.notify(mapFunc(cursor))
@@ -346,11 +348,12 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
         indexName = query.indexName
         keyRange = query.keyRange
         direction = query.direction
+        limit = query.limit
         req = if indexName
           @store.index(indexName).openCursor(keyRange, direction)
         else
           @store.openCursor(keyRange, direction)
-        @_mapCursor(defer, ((cursor) -> cursor.value), req)
+        @_mapCursor(defer, ((cursor) -> cursor.value), req, limit)
         defer.promise
 
       findWhere: (query) ->
@@ -452,6 +455,7 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
         @indexName = undefined
         @keyRange = undefined
         @direction = cursorDirection.next
+        @limit = 0
 
       $lt: (value) ->
         @keyRange = IDBKeyRange.upperBound(value, true)
@@ -488,6 +492,10 @@ angular.module('indexedDB', []).provider '$indexedDB', ->
       $index: (indexName) ->
         @indexName = indexName
         this
+
+      $limit: (limit) ->
+        @limit = limit
+        this        
     ###*
     @ngdoc method
     @name $indexedDB.objectStore
