@@ -304,7 +304,7 @@
             return new DbQ();
           };
 
-          ObjectStore.prototype._mapCursor = function(defer, mapFunc, req) {
+          ObjectStore.prototype._mapCursor = function(defer, mapFunc, req, limit) {
             var results;
             if (req == null) {
               req = this.store.openCursor();
@@ -313,6 +313,9 @@
             defer.rejectWith(req);
             return req.onsuccess = function(e) {
               var cursor;
+              if (limit !== null && limit > 0 && results.length >= limit) {
+                return defer.resolve(results);
+              }
               if (cursor = e.target.result) {
                 results.push(mapFunc(cursor));
                 defer.notify(mapFunc(cursor));
@@ -482,15 +485,16 @@
           };
 
           ObjectStore.prototype.eachWhere = function(query) {
-            var defer, direction, indexName, keyRange, req;
+            var defer, direction, indexName, keyRange, limit, req;
             defer = this.defer();
             indexName = query.indexName;
             keyRange = query.keyRange;
             direction = query.direction;
+            limit = query.limit;
             req = indexName ? this.store.index(indexName).openCursor(keyRange, direction) : this.store.openCursor(keyRange, direction);
             this._mapCursor(defer, (function(cursor) {
               return cursor.value;
-            }), req);
+            }), req, limit);
             return defer.promise;
           };
 
@@ -630,6 +634,7 @@
             this.indexName = void 0;
             this.keyRange = void 0;
             this.direction = cursorDirection.next;
+            this.limit = 0;
           }
 
           Query.prototype.$lt = function(value) {
@@ -680,6 +685,11 @@
 
           Query.prototype.$index = function(indexName) {
             this.indexName = indexName;
+            return this;
+          };
+
+          Query.prototype.$limit = function(limit) {
+            this.limit = limit;
             return this;
           };
 
