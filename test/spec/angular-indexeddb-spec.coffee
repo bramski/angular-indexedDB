@@ -5,8 +5,9 @@ describe "$indexedDB", ->
   $q = {}
 
   beforeEach ->
-    angular.module('indexedDB').config ($indexedDBProvider) ->
+    angular.module('indexedDB').config ($indexedDBProvider, $qProvider) ->
       providerConfig = $indexedDBProvider
+      $qProvider.errorOnUnhandledRejections(false)
 
     module 'indexedDB'
     inject(->)
